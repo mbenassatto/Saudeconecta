@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaúdeConecta — UBS / SUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F9F7;
+    --surface:#FFFFFF;
+    --ink:#17262A;
+    --ink-muted:#54686C;
+    --primary:#0B5D66;
+    --primary-dark:#073E45;
+    --primary-soft:#E4F0EF;
+    --accent-green:#2F8F5B;
+    --border:#DCE4E2;
+    --red:#C0463A;
+    --red-soft:#FBEAE7;
+    --orange:#DB8636;
+    --orange-soft:#FBEEDF;
+    --yellow:#C9A02A;
+    --yellow-soft:#FBF3DC;
+    --green:#3E9760;
+    --green-soft:#E7F4EC;
+    --azul:#5A7C93;
+    --azul-soft:#EAF0F3;
+    --gray:#8A9A9C;
+    --gray-soft:#EEF2F1;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Public Sans', -apple-system, sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{
+    font-family:'Lora', serif;
+    margin:0 0 4px 0;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  button{font-family:inherit;}
+  a{color:var(--primary);}
+
+  /* ---------- topo ---------- */
+  .topbar{
+    background:var(--primary-dark);
+    color:#fff;
+    padding:14px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:3px solid var(--accent-green);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .brand{display:flex; align-items:baseline; gap:10px;}
+  .brand .mark{
+    width:34px;height:34px;border-radius:8px;background:var(--accent-green);
+    display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;
+    font-weight:700;font-size:17px;color:#0d2b23;flex:none;
+  }
+  .brand h1{font-size:19px;color:#fff;margin:0;}
+  .brand .tag{font-size:12px;color:#CFE3DF;font-family:'Public Sans';}
+  .portal-switch{display:flex;gap:6px;background:rgba(255,255,255,0.08);padding:4px;border-radius:6px;}
+  .portal-switch button{
+    background:transparent;border:none;color:#DCEBE8;padding:8px 14px;border-radius:4px;
+    font-size:13.5px;font-weight:600;cursor:pointer;
+  }
+  .portal-switch button.active{background:var(--accent-green);color:#08251c;}
+
+  /* ---------- layout ---------- */
+  .app{max-width:1180px;margin:0 auto;padding:28px 24px 60px;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:24px;flex-wrap:wrap;}
+  .tabs button{
+    background:none;border:none;padding:12px 16px;font-size:14px;font-weight:600;
+    color:var(--ink-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+  }
+  .tabs button.active{color:var(--primary-dark);border-bottom-color:var(--accent-green);}
+
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px;
+    margin-bottom:20px;
+  }
+  .card h2{font-size:18px;color:var(--primary-dark);}
+  .card .sub{color:var(--ink-muted);font-size:13.5px;margin-bottom:16px;}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+  @media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:5px;}
+  input,select,textarea{
+    width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:var(--radius);
+    font-size:14px;font-family:inherit;color:var(--ink);background:#fff;
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:1px;}
+  .field{margin-bottom:14px;}
+  textarea{resize:vertical;min-height:64px;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--primary);color:#fff;border:none;padding:10px 18px;
+    border-radius:var(--radius);font-weight:600;font-size:14px;cursor:pointer;
+  }
+  .btn:hover{background:var(--primary-dark);}
+  .btn.secondary{background:transparent;color:var(--primary-dark);border:1px solid var(--primary);}
+  .btn.secondary:hover{background:var(--primary-soft);}
+  .btn.ghost{background:transparent;color:var(--ink-muted);border:1px solid var(--border);}
+  .btn.danger{background:transparent;color:var(--red);border:1px solid #E9C6C0;}
+  .btn.danger:hover{background:var(--red-soft);}
+  .btn.small{padding:6px 12px;font-size:12.5px;}
+  .btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  .msg{padding:10px 14px;border-radius:var(--radius);font-size:13.5px;margin-bottom:14px;display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:var(--green-soft);color:#1f5e3a;border:1px solid #bfe0cc;}
+  .msg.warn{background:var(--red-soft);color:#7f2a20;border:1px solid #eec6bf;}
+
+  /* slots de horário */
+  .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:8px;}
+  .slot{
+    border:1px solid var(--border);padding:9px 6px;text-align:center;border-radius:var(--radius);
+    font-size:13px;cursor:pointer;background:#fff;font-weight:600;color:var(--ink);
+  }
+  .slot.taken{background:#F1F1F1;color:#B3B3B3;cursor:not-allowed;text-decoration:line-through;}
+  .slot.selected{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  /* escala de dor */
+  .pain-scale{display:flex;gap:5px;margin-top:6px;}
+  .pain-scale button{
+    flex:1;padding:9px 0;border:1px solid var(--border);background:#fff;border-radius:var(--radius);
+    font-weight:700;cursor:pointer;font-size:13px;
+  }
+  .pain-scale button.selected{background:var(--primary-dark);color:#fff;border-color:var(--primary-dark);}
+
+  .checklist{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;}
+  .checklist label{
+    display:flex;align-items:center;gap:8px;font-weight:500;font-size:13.5px;
+    border:1px solid var(--border);padding:9px 10px;border-radius:var(--radius);cursor:pointer;
+  }
+  .checklist input{width:auto;}
+  @media(max-width:720px){.checklist{grid-template-columns:1fr;}}
+
+  .urgency-result{
+    display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--radius);
+    border-left:6px solid; margin-top:10px;
+  }
+  .urgency-badge{
+    font-family:'Lora',serif;font-weight:700;font-size:15px;padding:5px 12px;border-radius:3px;color:#fff;
+    white-space:nowrap;
+  }
+
+  .info-box{
+    background:var(--primary-soft);border:1px solid #C7DEDA;border-radius:var(--radius);
+    padding:12px 14px;font-size:13.5px;margin-bottom:16px;
+  }
+  .info-box .k{font-weight:700;color:var(--primary-dark);}
+
+  .queue-row{
+    display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);
+    border-left:6px solid var(--border);border-radius:var(--radius);margin-bottom:10px;background:#fff;
+    flex-wrap:wrap;
+  }
+  .queue-row .who{flex:1;min-width:200px;}
+  .queue-row .who .name{font-weight:700;font-size:15px;}
+  .queue-row .who .meta{font-size:12.5px;color:var(--ink-muted);margin-top:2px;}
+  .queue-row .badge{
+    font-size:12px;font-weight:700;color:#fff;padding:4px 10px;border-radius:3px;white-space:nowrap;
+  }
+  .queue-row .time{font-size:13px;color:var(--ink-muted);width:56px;text-align:center;flex:none;}
+  .queue-row .actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+  .filters button{
+    border:1px solid var(--border);background:#fff;padding:7px 13px;border-radius:20px;
+    font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-muted);
+  }
+  .filters button.active{background:var(--primary-dark);color:#fff;border-color:var(--primary-dark);}
+
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+  @media(max-width:820px){.metrics{grid-template-columns:1fr 1fr;}}
+  .metric{border:1px solid var(--border);border-radius:var(--radius);padding:16px;background:#fff;}
+  .metric .num{font-family:'Lora',serif;font-size:28px;font-weight:700;color:var(--primary-dark);}
+  .metric .lbl{font-size:12.5px;color:var(--ink-muted);margin-top:2px;}
+
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+  .bar-row .lbl{width:88px;font-size:12.5px;font-weight:600;flex:none;}
+  .bar-track{flex:1;background:#EEF2F1;border-radius:3px;height:14px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:3px;}
+  .bar-row .val{width:26px;text-align:right;font-size:12.5px;color:var(--ink-muted);flex:none;}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{text-align:left;color:var(--ink-muted);font-size:12px;text-transform:none;padding:8px 10px;border-bottom:1px solid var(--border);}
+  td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+
+  .empty{padding:30px 10px;text-align:center;color:var(--ink-muted);font-size:14px;}
+
+  .help-item{border-top:1px solid var(--border);padding:16px 0;}
+  .help-item:first-child{border-top:none;padding-top:0;}
+  .help-item h3{font-size:15px;color:var(--primary-dark);margin-bottom:4px;}
+  .help-item p{margin:0;font-size:13.5px;color:var(--ink-muted);}
+
+  .history-card{border:1px solid var(--border);border-left:5px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px;}
+  .history-card .top-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+  .history-card .top-row .date{font-weight:700;font-size:14px;}
+  .history-card .detail{font-size:13px;color:var(--ink-muted);}
+  .history-card .detail b{color:var(--ink);}
+
+  /* autenticação */
+  .auth-wrap{max-width:460px;margin:20px auto 0;}
+  .auth-toggle{display:flex;gap:2px;margin-bottom:16px;border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+  .auth-toggle button{flex:1;background:#fff;border:none;padding:10px;font-size:13.5px;font-weight:700;color:var(--ink-muted);cursor:pointer;}
+  .auth-toggle button.active{background:var(--primary-dark);color:#fff;}
+  .demo-hint{font-size:12px;color:var(--ink-muted);background:#F4F7F6;border:1px dashed var(--border);padding:10px 12px;border-radius:4px;margin-top:14px;line-height:1.6;}
+  .role-pill{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11.5px;font-weight:700;}
+  .role-pill.recepcao{background:var(--azul-soft);color:var(--azul);}
+  .role-pill.clinico{background:var(--green-soft);color:#215c3d;}
+  .session-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:var(--primary-soft);border:1px solid #C7DEDA;border-radius:var(--radius);
+    padding:10px 16px;margin-bottom:20px;font-size:13.5px;
+  }
+  .link-btn{background:none;border:none;color:var(--primary);font-weight:700;font-size:13px;cursor:pointer;padding:0;text-decoration:underline;}
+
+  footer{text-align:center;color:var(--ink-muted);font-size:12px;padding:20px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">S+</div>
+    <div>
+      <h1>SaúdeConecta</h1>
+      <div class="tag">Agendamento e triagem — Unidades Básicas de Saúde · SUS · São Paulo</div>
+      <div class="tag" style="font-size:11px;opacity:0.85;">Desenvolvido por Miguel Stenke Ramos Benassatto</div>
+    </div>
+  </div>
+  <div class="portal-switch">
+    <button id="btnPortalPaciente" class="active" onclick="setPortal('paciente')">Sou paciente</button>
+    <button id="btnPortalProfissional" onclick="setPortal('profissional')">Sou funcionário da UBS</button>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- ============ PORTAL PACIENTE ============ -->
+  <div id="view-paciente" class="view active">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showPacientePanel('cadastro')">1. Cadastro</button>
+      <button class="tab-btn" onclick="showPacientePanel('sintomas')">2. Sintomas e dores</button>
+      <button class="tab-btn" onclick="showPacientePanel('situacao')">Minha situação</button>
+    </div>
+
+    <!-- Cadastro -->
+    <div id="panel-paciente-cadastro" class="panel active">
+      <div class="card">
+        <h2>Cadastro do paciente</h2>
+        <div class="sub">Preencha seus dados uma única vez. Depois disso, vá para a aba "Sintomas e dores" para o atendimento do dia.</div>
+        <div id="msgCadastro" class="msg"></div>
+        <div class="grid2">
+          <div class="field">
+            <label for="pNome">Nome completo</label>
+            <input id="pNome" placeholder="Ex.: Maria da Silva Santos">
+          </div>
+          <div class="field">
+            <label for="pNasc">Data de nascimento</label>
+            <input id="pNasc" type="date">
+          </div>
+          <div class="field">
+            <label for="pTel">Telefone / WhatsApp</label>
+            <input id="pTel" placeholder="(11) 90000-0000">
+          </div>
+          <div class="field">
+            <label for="pCartao">Cartão SUS (CNS)</label>
+            <input id="pCartao" placeholder="Número do Cartão Nacional de Saúde">
+          </div>
+          <div class="field">
+            <label for="pUbs">UBS de referência</label>
+            <select id="pUbs">
+              <option value="UBS Vila Pirituba I">UBS Vila Pirituba I — Rua Ribeirão Vermelho, 501 – Vila Pirituba</option>
+              <option value="UBS/AMA Vila Pereira Barreto">UBS/AMA Vila Pereira Barreto — Rua Dom Manoel D'Elboux, 76 – Vila Pereira Barreto</option>
+              <option value="UBS Jardim Santa Lucrécia">UBS Jardim Santa Lucrécia — Rua Araci Rondon Amarante, 22 – Jardim Santa Lucrécia</option>
+              <option value="UBS Jardim Cidade Pirituba">UBS Jardim Cidade Pirituba</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" onclick="cadastrarPaciente()">Salvar cadastro</button>
+      </div>
+    </div>
+
+    <!-- Sintomas e dores (pronto atendimento do dia) -->
+    <div id="panel-paciente-sintomas" class="panel">
+      <div class="card">
+        <h2>Sintomas e dores</h2>
+        <div class="sub">Use esta tela no dia do atendimento (demanda espontânea, sem agendamento prévio). Conte o que você está sentindo para a equipe te chamar na ordem correta.</div>
+
+        <div id="identBox"></div>
+
+        <div id="sintomasBloqueado" class="info-box" style="display:none;">
+          Identifique-se pelo telefone cadastrado (acima) para registrar seus sintomas.
+        </div>
+
+        <div id="sintomasConteudo" style="display:none;">
+          <div id="msgSintomas" class="msg"></div>
+
+          <div class="field">
+            <label>O que você está sentindo? (marque tudo que se aplica)</label>
+            <div class="checklist" id="listaSintomas">
+              <label><input type="checkbox" value="Febre"> Febre</label>
+              <label><input type="checkbox" value="Tosse"> Tosse</label>
+              <label><input type="checkbox" value="Dor de cabeça"> Dor de cabeça</label>
+              <label><input type="checkbox" value="Dor de garganta"> Dor de garganta</label>
+              <label><input type="checkbox" value="Dor abdominal"> Dor abdominal / na barriga</label>
+              <label><input type="checkbox" value="Dor nas costas"> Dor nas costas</label>
+              <label><input type="checkbox" value="Náusea ou vômito"> Náusea ou vômito</label>
+              <label><input type="checkbox" value="Diarreia"> Diarreia</label>
+              <label><input type="checkbox" value="Tontura"> Tontura</label>
+              <label><input type="checkbox" value="Falta de apetite"> Falta de apetite</label>
+              <label><input type="checkbox" value="Coriza / espirros"> Coriza / espirros</label>
+              <label><input type="checkbox" value="Dificuldade para urinar"> Dificuldade para urinar</label>
+              <label><input type="checkbox" value="Mancha ou vermelhidão na pele"> Mancha ou vermelhidão na pele</label>
+              <label><input type="checkbox" value="Inchaço em alguma parte do corpo"> Inchaço em alguma parte do corpo</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Qual o nível da sua dor agora? (0 = nenhuma, 10 = insuportável)</label>
+            <div class="pain-scale" id="painScale"></div>
+          </div>
+
+          <div class="field">
+            <label for="sDuracao">Há quanto tempo você sente isso?</label>
+            <select id="sDuracao">
+              <option>Hoje / menos de 24 horas</option>
+              <option>1 a 3 dias</option>
+              <option>4 a 7 dias</option>
+              <option>Mais de uma semana</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="sDetalhes">Quer contar mais alguma coisa? (onde dói, o que piora ou melhora, outros detalhes)</label>
+            <textarea id="sDetalhes" placeholder="Ex.: dor começou depois de comer, piora ao deitar"></textarea>
+          </div>
+
+          <button class="btn" onclick="submeterSintomas()">Enviar sintomas</button>
+          <div id="resultadoSintomas"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minha situação -->
+    <div id="panel-paciente-situacao" class="panel">
+      <div class="card">
+        <h2>Minha situação</h2>
+        <div class="sub">Veja apenas os seus próprios atendimentos e o status atual de cada um.</div>
+        <div id="situacaoConteudo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PORTAL PROFISSIONAL ============ -->
+  <div id="view-profissional" class="view">
+
+    <!-- Portão de autenticação -->
+    <div id="staffAuthGate">
+      <div class="auth-wrap">
+        <div class="auth-toggle">
+          <button id="authTabLogin" class="active" onclick="setAuthMode('login')">Entrar</button>
+          <button id="authTabCadastro" onclick="setAuthMode('cadastro')">Cadastrar funcionário</button>
+        </div>
+
+        <div id="authLoginBox" class="card">
+          <h2>Acesso da equipe</h2>
+          <div class="sub">Área restrita aos funcionários da unidade.</div>
+          <div id="msgLoginFunc" class="msg"></div>
+          <div class="field">
+            <label for="loginUsuario">Usuário</label>
+            <input id="loginUsuario" placeholder="usuario">
+          </div>
+          <div class="field">
+            <label for="loginSenha">Senha</label>
+            <input id="loginSenha" type="password" placeholder="••••••">
+          </div>
+          <button class="btn" onclick="loginFuncionario()">Entrar</button>
+          <div class="demo-hint">
+            <b>Contas de demonstração deste protótipo:</b><br>
+            Recepção → usuário <b>recepcao</b> / senha <b>1234</b><br>
+            Enfermagem → usuário <b>enfermagem</b> / senha <b>1234</b><br>
+            Médico → usuário <b>medico</b> / senha <b>1234</b>
+          </div>
+        </div>
+
+        <div id="authCadastroBox" class="card" style="display:none;">
+          <h2>Cadastro de funcionário</h2>
+          <div class="sub">Criação de acesso privado para a equipe da UBS.</div>
+          <div id="msgCadastroFunc" class="msg"></div>
+          <div class="field">
+            <label for="fNome">Nome completo</label>
+            <input id="fNome" placeholder="Nome do funcionário">
+          </div>
+          <div class="field">
+            <label for="fCargo">Cargo</label>
+            <select id="fCargo">
+              <option>Recepcionista</option>
+              <option>Enfermeiro(a)</option>
+              <option>Médico(a)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="fUsuario">Usuário</label>
+            <input id="fUsuario" placeholder="Escolha um nome de usuário">
+          </div>
+          <div class="field">
+            <label for="fSenha">Senha</label>
+            <input id="fSenha" type="password" placeholder="Crie uma senha">
+          </div>
+          <button class="btn" onclick="cadastrarFuncionario()">Criar acesso e entrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área autenticada -->
+    <div id="staffApp" style="display:none;">
+      <div class="session-bar">
+        <div id="staffSessionInfo"></div>
+        <button class="btn ghost small" onclick="logoutFuncionario()">Sair</button>
+      </div>
+
+      <div class="tabs" id="staffTabs"></div>
+
+      <!-- Agenda (recepcionista) -->
+      <div id="panel-profissional-agenda" class="panel">
+        <div class="card">
+          <h2>Nova consulta</h2>
+          <div class="sub">Localize o paciente pelo telefone cadastrado ou registre um novo, depois escolha tipo, data e horário.</div>
+          <div id="msgAgendaStaff" class="msg"></div>
+
+          <div class="field">
+            <label for="stfTelefone">Telefone do paciente</label>
+            <div style="display:flex; gap:8px;">
+              <input id="stfTelefone" placeholder="(11) 90000-0000" style="flex:1;">
+              <button class="btn secondary" type="button" onclick="buscarPacienteStaff()">Localizar</button>
+            </div>
+          </div>
+          <div id="stfPacienteEncontrado"></div>
+          <button class="link-btn" type="button" onclick="toggleCadastroRapido()">Paciente novo? Cadastrar agora</button>
+
+          <div id="cadastroRapidoBox" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+            <div class="grid2">
+              <div class="field"><label for="crNome">Nome completo</label><input id="crNome"></div>
+              <div class="field"><label for="crNasc">Data de nascimento</label><input id="crNasc" type="date"></div>
+              <div class="field"><label for="crTel">Telefone</label><input id="crTel" placeholder="(11) 90000-0000"></div>
+              <div class="field"><label for="crCartao">Cartão SUS (CNS)</label><input id="crCartao"></div>
+              <div class="field">
+                <label for="crUbs">UBS de referência</label>
+                <select id="crUbs">
+                  <option value="UBS Vila Pirituba I">UBS Vila Pirituba I</option>
+                  <option value="UBS/AMA Vila Pereira Barreto">UBS/AMA Vila Pereira Barreto</option>
+                  <option value="UBS Jardim Santa Lucrécia">UBS Jardim Santa Lucrécia</option>
+                  <option value="UBS Jardim Cidade Pirituba">UBS Jardim Cidade Pirituba</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn secondary" type="button" onclick="cadastrarPacienteRapido()">Salvar e selecionar paciente</button>
+          </div>
+
+          <div class="grid2" style="margin-top:16px;">
+            <div class="field">
+              <label for="stfTipo">Tipo de atendimento</label>
+              <select id="stfTipo">
+                <option>Consulta clínica geral</option>
+                <option>Pediatria</option>
+                <option>Ginecologia / pré-natal</option>
+                <option>Curativo / enfermagem</option>
+                <option>Retorno</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="stfData">Data</label>
+              <select id="stfData" onchange="renderSlotsStaff()"></select>
+            </div>
+          </div>
+          <label>Horários disponíveis</label>
+          <div id="stfSlotsWrap" class="slots"></div>
+          <div style="margin-top:16px;">
+            <button class="btn" onclick="confirmarAgendamentoStaff()">Confirmar agendamento</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Consultas agendadas</h2>
+          <div class="sub">Controle dos horários marcados: nome, telefone e tipo de atendimento de cada paciente.</div>
+          <label style="margin-bottom:6px;">Data</label>
+          <div class="filters" id="filtrosAgendaData"></div>
+          <label style="margin-bottom:6px;">Situação</label>
+          <div class="filters" id="filtrosAgendaStatus"></div>
+          <div id="agendaTabela"></div>
+        </div>
+      </div>
+
+      <!-- Fila (clínico) -->
+      <div id="panel-profissional-fila" class="panel">
+        <div class="card">
+          <h2>Fila priorizada por urgência</h2>
+          <div class="sub">Pacientes de demanda espontânea com triagem concluída, ordenados por gravidade e depois por ordem de chegada.</div>
+          <div class="filters" id="filtrosUrgencia"></div>
+          <div id="filaAtendimento"></div>
+        </div>
+        <div class="card">
+          <h2>Finalizados hoje</h2>
+          <div id="listaFinalizados"></div>
+        </div>
+      </div>
+
+      <!-- Triagem (clínico) -->
+      <div id="panel-profissional-triagem" class="panel">
+        <div class="card">
+          <h2>Triagem inicial</h2>
+          <div class="sub">Registre sinais de alerta e sinais vitais para os pacientes que já relataram sintomas hoje.</div>
+          <div id="msgTriagem" class="msg"></div>
+
+          <div class="field">
+            <label for="tAgendamento">Paciente aguardando triagem</label>
+            <select id="tAgendamento" onchange="renderResumoSintomas()"></select>
+          </div>
+
+          <div id="resumoSintomas"></div>
+
+          <div class="field">
+            <label>Sinais de alerta (marque se houver)</label>
+            <div class="checklist">
+              <label><input type="checkbox" id="alertaPeito"> Dor forte no peito</label>
+              <label><input type="checkbox" id="alertaFalta"> Falta de ar intensa</label>
+              <label><input type="checkbox" id="alertaSangramento"> Sangramento intenso</label>
+              <label><input type="checkbox" id="alertaConsciencia"> Confusão mental / desmaio</label>
+            </div>
+          </div>
+
+          <div class="grid3">
+            <div class="field">
+              <label for="tTemp">Temperatura (°C)</label>
+              <input id="tTemp" type="number" step="0.1" placeholder="36.5">
+            </div>
+            <div class="field">
+              <label for="tPasSist">Pressão sistólica</label>
+              <input id="tPasSist" type="number" placeholder="120">
+            </div>
+            <div class="field">
+              <label for="tPasDiast">Pressão diastólica</label>
+              <input id="tPasDiast" type="number" placeholder="80">
+            </div>
+          </div>
+
+          <button class="btn" onclick="submeterTriagem()">Concluir triagem</button>
+          <div id="resultadoTriagem"></div>
+        </div>
+      </div>
+
+      <!-- Sintomas — histórico por chegada (clínico) -->
+      <div id="panel-profissional-sintomas" class="panel">
+        <div class="card">
+          <h2>Sintomas relatados hoje</h2>
+          <div class="sub">Tudo o que os pacientes informaram na aba "Sintomas e dores", em ordem de chegada. Somente leitura — o preenchimento é feito pelo próprio paciente.</div>
+          <div id="sintomasHistorico"></div>
+        </div>
+      </div>
+
+      <!-- Histórico do paciente (clínico) -->
+      <div id="panel-profissional-historico" class="panel">
+        <div class="card">
+          <h2>Histórico por paciente</h2>
+          <div class="sub">Busque um paciente pelo nome ou telefone para ver todo o histórico de agendamentos e sintomas.</div>
+          <div style="display:flex; gap:8px; max-width:460px;">
+            <input id="hstBusca" placeholder="Nome ou telefone">
+            <button class="btn secondary" onclick="buscarHistorico()">Buscar</button>
+          </div>
+          <div id="historicoResultados" style="margin-top:16px;"></div>
+          <div id="historicoResumo"></div>
+          <div id="historicoLista"></div>
+        </div>
+      </div>
+
+      <!-- Indicadores (clínico) -->
+      <div id="panel-profissional-indicadores" class="panel">
+        <div class="card">
+          <h2>Indicadores da unidade</h2>
+          <div class="sub">Painel para avaliar o impacto do sistema na espera e na organização da demanda espontânea.</div>
+          <div class="metrics" id="metricsWrap"></div>
+        </div>
+        <div class="card">
+          <h2>Distribuição por nível de urgência</h2>
+          <div id="urgencyBars"></div>
+        </div>
+      </div>
+
+      <!-- Ajuda (clínico) -->
+      <div id="panel-profissional-ajuda" class="panel">
+        <div class="card">
+          <h2>Guia rápido de capacitação</h2>
+          <div class="sub">Material de apoio para a equipe usar o sistema de forma autônoma.</div>
+
+          <div class="help-item">
+            <h3>1. Sintomas relatados pelo paciente</h3>
+            <p>O paciente preenche sozinho a aba "Sintomas e dores" ao chegar à unidade. Aqui você só acompanha o que foi relatado, em ordem de chegada.</p>
+          </div>
+          <div class="help-item">
+            <h3>2. Triagem</h3>
+            <p>Selecione o paciente pendente, registre sinais de alerta e sinais vitais. O sistema calcula automaticamente o nível de urgência, mas o julgamento clínico da equipe sempre prevalece.</p>
+          </div>
+          <div class="help-item">
+            <h3>3. Fila de atendimento</h3>
+            <p>Já vem ordenada pela urgência. Ao final de cada atendimento, marque "Atendido", "Não compareceu" ou "Não atendido" (informando o motivo).</p>
+          </div>
+          <div class="help-item">
+            <h3>4. Histórico do paciente</h3>
+            <p>Busque por nome ou telefone para ver o histórico completo de um paciente específico — nunca uma lista geral de todos os cadastrados.</p>
+          </div>
+          <div class="help-item">
+            <h3>Precisa de ajuda?</h3>
+            <p>Procure a coordenação da unidade para sanar dúvidas ou solicitar um novo treinamento presencial.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>SaúdeConecta — protótipo funcional. Dados mantidos apenas durante esta sessão (sem envio a servidores).<br>Desenvolvido por Miguel Stenke Ramos Benassatto.</footer>
+
+<script>
+/* ======================= ESTADO EM MEMÓRIA ======================= */
+let state = {
+  patients: [],
+  appointments: [],
+  funcionarios: [],
+  nextPatientId: 1,
+  nextApptId: 1,
+  nextFuncId: 1,
+  selectedSlot: null,
+  selectedPain: null,
+  activeFilter: 'todos',
+  agendaFilterDate: 'todas',
+  agendaFilterStatus: 'todos',
+  pacienteAtual: null,
+  staffAgendaPacienteId: null,
+  funcionarioLogado: null
+};
+
+const URGENCY = {
+  vermelho: {label:'Vermelho — Emergência', color:'var(--red)', soft:'var(--red-soft)', order:0, sla:'Imediato'},
+  laranja:  {label:'Laranja — Muito urgente', color:'var(--orange)', soft:'var(--orange-soft)', order:1, sla:'Até 10 min'},
+  amarelo:  {label:'Amarelo — Urgente', color:'var(--yellow)', soft:'var(--yellow-soft)', order:2, sla:'Até 60 min'},
+  verde:    {label:'Verde — Pouco urgente', color:'var(--green)', soft:'var(--green-soft)', order:3, sla:'Até 2 horas'},
+  azul:     {label:'Azul — Não urgente', color:'var(--azul)', soft:'var(--azul-soft)', order:4, sla:'Consulta de rotina'}
+};
+
+const TIPOS_AGENDA = ['Consulta clínica geral', 'Pediatria', 'Ginecologia / pré-natal', 'Curativo / enfermagem', 'Retorno'];
+const STORAGE_KEY = 'saudeconecta-estado';
+
+/* ======================= PERSISTÊNCIA (sobrevive a F5 / fechar a página) ======================= */
+async function salvarEstado(){
+  try{
+    const dados = {
+      patients: state.patients,
+      appointments: state.appointments,
+      funcionarios: state.funcionarios,
+      nextPatientId: state.nextPatientId,
+      nextApptId: state.nextApptId,
+      nextFuncId: state.nextFuncId
+    };
+    await window.storage.set(STORAGE_KEY, JSON.stringify(dados), true);
+  }catch(e){
+    console.error('Não foi possível salvar os dados agora.', e);
+  }
+}
+
+async function carregarEstado(){
+  try{
+    const resultado = await window.storage.get(STORAGE_KEY, true);
+    if(resultado && resultado.value){
+      const dados = JSON.parse(resultado.value);
+      state.patients = dados.patients || [];
+      state.appointments = dados.appointments || [];
+      state.funcionarios = dados.funcionarios || [];
+      state.nextPatientId = dados.nextPatientId || 1;
+      state.nextApptId = dados.nextApptId || 1;
+      state.nextFuncId = dados.nextFuncId || 1;
+      return true;
+    }
+  }catch(e){
+    console.log('Nenhum dado salvo encontrado ainda — começando com dados de exemplo.');
+  }
+  return false;
+}
+
+/* ======================= DADOS DE EXEMPLO ======================= */
+function seedData(){
+  addFuncionario({nome:'Equipe da Recepção', cargo:'Recepcionista', usuario:'recepcao', senha:'1234'});
+  addFuncionario({nome:'Enf. Marta Silva', cargo:'Enfermeiro(a)', usuario:'enfermagem', senha:'1234'});
+  addFuncionario({nome:'Dr. Ricardo Alves', cargo:'Médico(a)', usuario:'medico', senha:'1234'});
+
+  const p1 = addPatient({nome:'Ana Beatriz Souza', nasc:'1990-04-12', tel:'(11) 91234-5678', cartao:'700000000000001', ubs:'UBS Vila Pirituba I'});
+  const p2 = addPatient({nome:'Carlos Eduardo Lima', nasc:'1978-09-03', tel:'(11) 92345-6789', cartao:'700000000000002', ubs:'UBS/AMA Vila Pereira Barreto'});
+  const p3 = addPatient({nome:'José Ribeiro', nasc:'1955-01-20', tel:'(11) 93456-7890', cartao:'700000000000003', ubs:'UBS Jardim Santa Lucrécia'});
+
+  const s1 = criarProntoAtendimento(p1.id, {selecionados:['Tosse','Coriza / espirros'], dor:3, duracao:'1 a 3 dias', detalhes:'Tosse seca, sem falta de ar.'});
+  const s2 = criarProntoAtendimento(p2.id, {selecionados:['Falta de apetite'], dor:6, duracao:'Hoje / menos de 24 horas', detalhes:'Falta de ar ao subir escadas.'});
+  const s3 = criarProntoAtendimento(p3.id, {selecionados:['Febre','Dor de cabeça'], dor:8, duracao:'Hoje / menos de 24 horas', detalhes:'Febre alta desde ontem à noite.'});
+
+  aplicarTriagem(s1.id, {alertaPeito:false, alertaFalta:false, alertaSangramento:false, alertaConsciencia:false, temp:37.2, sist:130, diast:85});
+  aplicarTriagem(s2.id, {alertaPeito:false, alertaFalta:true, alertaSangramento:false, alertaConsciencia:false, temp:36.8, sist:140, diast:90});
+
+  const dates = getUpcomingDates();
+  addAppointment(p1.id, 'Retorno', dates[1], '10:00');
+}
+
+/* ======================= FUNCIONÁRIOS / AUTENTICAÇÃO ======================= */
+function addFuncionario(data){
+  const f = Object.assign({id: state.nextFuncId++}, data);
+  state.funcionarios.push(f);
+  return f;
+}
+
+function cargoGroup(cargo){
+  return cargo === 'Recepcionista' ? 'recepcao' : 'clinico';
+}
+
+function setAuthMode(mode){
+  document.getElementById('authTabLogin').classList.toggle('active', mode==='login');
+  document.getElementById('authTabCadastro').classList.toggle('active', mode==='cadastro');
+  document.getElementById('authLoginBox').style.display = mode==='login' ? 'block' : 'none';
+  document.getElementById('authCadastroBox').style.display = mode==='cadastro' ? 'block' : 'none';
+}
+
+function loginFuncionario(){
+  const usuario = document.getElementById('loginUsuario').value.trim();
+  const senha = document.getElementById('loginSenha').value;
+  const f = state.funcionarios.find(x=>x.usuario===usuario && x.senha===senha);
+  if(!f){
+    showMsg('msgLoginFunc', 'Usuário ou senha inválidos.', 'warn');
+    return;
+  }
+  state.funcionarioLogado = f;
+  document.getElementById('loginUsuario').value = '';
+  document.getElementById('loginSenha').value = '';
+  atualizarPortalProfissional();
+}
+
+function cadastrarFuncionario(){
+  const nome = document.getElementById('fNome').value.trim();
+  const cargo = document.getElementById('fCargo').value;
+  const usuario = document.getElementById('fUsuario').value.trim();
+  const senha = document.getElementById('fSenha').value;
+
+  if(!nome || !usuario || !senha){
+    showMsg('msgCadastroFunc', 'Preencha nome, usuário e senha.', 'warn');
+    return;
+  }
+  if(state.funcionarios.some(x=>x.usuario===usuario)){
+    showMsg('msgCadastroFunc', 'Esse usuário já existe. Escolha outro nome de usuário.', 'warn');
+    return;
+  }
+  const f = addFuncionario({nome, cargo, usuario, senha});
+  state.funcionarioLogado = f;
+  ['fNome','fUsuario','fSenha'].forEach(id=>document.getElementById(id).value='');
+  salvarEstado();
+  atualizarPortalProfissional();
+}
+
+function logoutFuncionario(){
+  state.funcionarioLogado = null;
+  atualizarPortalProfissional();
+}
+
+function atualizarPortalProfissional(){
+  const logado = !!state.funcionarioLogado;
+  document.getElementById('staffAuthGate').style.display = logado ? 'none' : 'block';
+  document.getElementById('staffApp').style.display = logado ? 'block' : 'none';
+  if(!logado) return;
+
+  const f = state.funcionarioLogado;
+  const grupo = cargoGroup(f.cargo);
+  document.getElementById('staffSessionInfo').innerHTML =
+    `Conectado como <strong>${f.nome}</strong> · ${f.cargo} <span class="role-pill ${grupo}">${grupo==='recepcao' ? 'Recepção' : 'Equipe clínica'}</span>`;
+
+  renderStaffTabs();
+  const primeiraAba = grupo === 'recepcao' ? 'agenda' : 'fila';
+  showStaffPanel(primeiraAba);
+}
+
+function tabsPermitidas(){
+  const grupo = cargoGroup(state.funcionarioLogado.cargo);
+  if(grupo === 'recepcao'){
+    return [['agenda','Agenda']];
+  }
+  return [
+    ['fila','Fila de atendimento'],
+    ['triagem','Triagem'],
+    ['sintomas','Sintomas e dores'],
+    ['historico','Histórico do paciente'],
+    ['indicadores','Indicadores'],
+    ['ajuda','Ajuda']
+  ];
+}
+
+function renderStaffTabs(){
+  const wrap = document.getElementById('staffTabs');
+  const tabs = tabsPermitidas();
+  wrap.innerHTML = tabs.map(([key,label], i)=>
+    `<button class="tab-btn ${i===0?'active':''}" data-key="${key}" onclick="showStaffPanel('${key}')">${label}</button>`
+  ).join('');
+}
+
+function showStaffPanel(key){
+  const permitidas = tabsPermitidas().map(t=>t[0]);
+  if(!permitidas.includes(key)) return;
+
+  document.querySelectorAll('#staffApp .panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('panel-profissional-'+key).classList.add('active');
+  document.querySelectorAll('#staffTabs .tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.key===key));
+
+  if(key==='agenda'){ renderAgendaTabela(); populateDatesStaff(); renderSlotsStaff(); }
+  if(key==='fila'){ renderFilaStaff(); }
+  if(key==='triagem'){ refreshTriagemSelect(); renderResumoSintomas(); }
+  if(key==='sintomas'){ renderSintomasHistoricoStaff(); }
+  if(key==='historico'){ /* aguarda busca */ }
+  if(key==='indicadores'){ renderIndicadoresStaff(); }
+}
+
+function showMsg(id, text, type){
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg show ' + type;
+  setTimeout(()=>{ el.classList.remove('show'); }, 4000);
+}
+
+/* ======================= NAVEGAÇÃO PACIENTE ======================= */
+function setPortal(p){
+  document.getElementById('view-paciente').classList.toggle('active', p==='paciente');
+  document.getElementById('view-profissional').classList.toggle('active', p==='profissional');
+  document.getElementById('btnPortalPaciente').classList.toggle('active', p==='paciente');
+  document.getElementById('btnPortalProfissional').classList.toggle('active', p==='profissional');
+  if(p==='paciente'){ atualizarIdentificacaoPaciente(); }
+  if(p==='profissional'){ atualizarPortalProfissional(); }
+}
+
+function showPacientePanel(name){
+  document.querySelectorAll('#view-paciente .panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('panel-paciente-'+name).classList.add('active');
+  document.querySelectorAll('#view-paciente .tabs .tab-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  if(name==='sintomas'){ atualizarIdentificacaoPaciente(); renderPainScale(); }
+  if(name==='situacao'){ renderMinhaSituacao(); }
+}
+
+/* ======================= CADASTRO DE PACIENTE ======================= */
+function addPatient(data){
+  const patient = Object.assign({id: state.nextPatientId++}, data);
+  state.patients.push(patient);
+  return patient;
+}
+
+function cadastrarPaciente(){
+  const nome = document.getElementById('pNome').value.trim();
+  const nasc = document.getElementById('pNasc').value;
+  const tel = document.getElementById('pTel').value.trim();
+  const cartao = document.getElementById('pCartao').value.trim();
+  const ubs = document.getElementById('pUbs').value;
+
+  if(!nome || !tel){
+    showMsg('msgCadastro', 'Preencha ao menos nome e telefone.', 'warn');
+    return;
+  }
+  const p = addPatient({nome, nasc, tel, cartao, ubs});
+  state.pacienteAtual = p.id;
+  showMsg('msgCadastro', 'Cadastro salvo! Você já está identificado — vá para a aba "Sintomas e dores" quando precisar de atendimento.', 'ok');
+  ['pNome','pNasc','pTel','pCartao'].forEach(id=>document.getElementById(id).value='');
+  salvarEstado();
+}
+
+/* ======================= IDENTIFICAÇÃO DO PACIENTE (sessão leve) ======================= */
+function atualizarIdentificacaoPaciente(){
+  const box = document.getElementById('identBox');
+  const bloqueado = document.getElementById('sintomasBloqueado');
+  const conteudo = document.getElementById('sintomasConteudo');
+  if(!box) return;
+
+  if(state.pacienteAtual){
+    const p = state.patients.find(x=>x.id===state.pacienteAtual);
+    if(p){
+      box.innerHTML = `<div class="info-box">Identificado como <strong>${p.nome}</strong>${p.cartao ? ' — CNS '+p.cartao : ''}. <button class="link-btn" onclick="trocarPacienteAtual()">Não é você? Trocar</button></div>`;
+      if(bloqueado) bloqueado.style.display = 'none';
+      if(conteudo) conteudo.style.display = 'block';
+      return;
+    }
+  }
+  box.innerHTML = `
+    <div class="field" style="max-width:420px;">
+      <label for="idTelefone">Já tem cadastro? Informe seu telefone</label>
+      <div style="display:flex; gap:8px;">
+        <input id="idTelefone" placeholder="(11) 90000-0000" style="flex:1;">
+        <button class="btn secondary" type="button" onclick="identificarPaciente()">Entrar</button>
+      </div>
+    </div>
+    <div style="font-size:13px;color:var(--ink-muted);margin-bottom:10px;">Ainda não tem cadastro? Use a aba "Cadastro".</div>`;
+  if(bloqueado) bloqueado.style.display = 'block';
+  if(conteudo) conteudo.style.display = 'none';
+}
+
+function identificarPaciente(){
+  const tel = document.getElementById('idTelefone').value.trim();
+  if(!tel) return;
+  const numeros = tel.replace(/\D/g,'');
+  const p = state.patients.find(x=>x.tel.replace(/\D/g,'')===numeros);
+  if(!p){
+    document.getElementById('identBox').insertAdjacentHTML('beforeend', `<div class="msg show warn">Nenhum cadastro encontrado com esse telefone.</div>`);
+    return;
+  }
+  state.pacienteAtual = p.id;
+  atualizarIdentificacaoPaciente();
+}
+
+function trocarPacienteAtual(){
+  state.pacienteAtual = null;
+  atualizarIdentificacaoPaciente();
+}
+
+/* ======================= SINTOMAS E DORES (cria o pronto atendimento) ======================= */
+function renderPainScale(){
+  const wrap = document.getElementById('painScale');
+  if(!wrap) return;
+  state.selectedPain = null;
+  wrap.innerHTML = '';
+  for(let i=0;i<=10;i++){
+    const b = document.createElement('button');
+    b.textContent = i;
+    b.type = 'button';
+    b.onclick = ()=>{
+      document.querySelectorAll('#painScale button').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      state.selectedPain = i;
+    };
+    wrap.appendChild(b);
+  }
+}
+
+function nextCheckInOrder(){
+  return state.appointments.filter(a=>a.checkInOrder!==null).length + 1;
+}
+
+function criarProntoAtendimento(patientId, s){
+  const now = new Date();
+  const appt = {
+    id: state.nextApptId++,
+    patientId,
+    tipo: 'Pronto atendimento (sintomas)',
+    origem: 'pronto_atendimento',
+    data: now.toISOString().slice(0,10),
+    hora: String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0'),
+    status: 'aguardando_triagem',
+    symptomsReport: Object.assign({}, s, {reportedAt: now.toISOString()}),
+    triage: null,
+    checkInOrder: null,
+    attendedAt: null,
+    motivo: null
+  };
+  appt.checkInOrder = nextCheckInOrder();
+  state.appointments.push(appt);
+  return appt;
+}
+
+function submeterSintomas(){
+  if(!state.pacienteAtual){ showMsg('msgSintomas','Identifique-se antes de continuar.','warn'); return; }
+  if(state.selectedPain===null){ showMsg('msgSintomas','Informe o nível de dor.','warn'); return; }
+
+  const emAndamento = state.appointments.some(a=>
+    a.patientId===state.pacienteAtual && a.origem==='pronto_atendimento' &&
+    (a.status==='aguardando_triagem' || a.status==='aguardando'));
+  if(emAndamento){
+    showMsg('msgSintomas','Você já tem um atendimento em andamento hoje. Aguarde ser chamado pela equipe.','warn');
+    return;
+  }
+
+  const selecionados = Array.from(document.querySelectorAll('#listaSintomas input:checked')).map(el=>el.value);
+  const duracao = document.getElementById('sDuracao').value;
+  const detalhes = document.getElementById('sDetalhes').value.trim();
+
+  criarProntoAtendimento(state.pacienteAtual, {selecionados, dor: state.selectedPain, duracao, detalhes});
+
+  document.getElementById('resultadoSintomas').innerHTML = `
+    <div class="urgency-result" style="border-color:var(--primary); background:var(--primary-soft);">
+      <div style="font-size:13.5px;color:var(--ink);">
+        Sintomas registrados! Aguarde ser chamado pela equipe para a triagem. Em caso de piora, avise a recepção imediatamente.
+      </div>
+    </div>`;
+
+  document.querySelectorAll('#listaSintomas input').forEach(el=>el.checked=false);
+  document.getElementById('sDetalhes').value = '';
+  renderPainScale();
+  salvarEstado();
+}
+
+/* ======================= MINHA SITUAÇÃO (paciente) ======================= */
+function computeStatusLabel(appt){
+  switch(appt.status){
+    case 'atendido': return 'Atendido';
+    case 'nao_compareceu': return 'Não compareceu';
+    case 'nao_atendido': return 'Não atendido' + (appt.motivo ? ' — ' + appt.motivo : '');
+    case 'aguardando': return 'Aguardando atendimento';
+    case 'aguardando_triagem': return 'Aguardando triagem';
+    case 'agendado': return 'Agendado';
+    default: return appt.status;
+  }
+}
+
+function formatDateBR(iso){
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function renderMinhaSituacao(){
+  const wrap = document.getElementById('situacaoConteudo');
+  if(!state.pacienteAtual){
+    wrap.innerHTML = `<div class="empty">Identifique-se na aba "Sintomas e dores" para ver sua situação.</div>`;
+    return;
+  }
+  const meus = state.appointments
+    .filter(a=>a.patientId===state.pacienteAtual)
+    .slice()
+    .sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
+
+  if(!meus.length){
+    wrap.innerHTML = `<div class="empty">Você ainda não tem nenhum atendimento registrado.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <table>
+      <tr><th>Data</th><th>Hora</th><th>Atendimento</th><th>Situação</th><th>Urgência</th></tr>
+      ${meus.map(a=>{
+        const u = a.triage ? URGENCY[a.triage.urgencia] : null;
+        return `<tr>
+          <td>${formatDateBR(a.data)}</td>
+          <td>${a.hora}</td>
+          <td>${a.tipo}</td>
+          <td>${computeStatusLabel(a)}</td>
+          <td>${u ? `<span class="badge" style="background:${u.color};padding:3px 8px;border-radius:3px;color:#fff;font-size:12px;">${u.label.split(' — ')[0]}</span>` : '—'}</td>
+        </tr>`;
+      }).join('')}
+    </table>`;
+}
+
+/* ======================= AGENDA (recepcionista) ======================= */
+function getUpcomingDates(){
+  const arr = [];
+  const today = new Date();
+  for(let i=0;i<5;i++){
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    arr.push(d.toISOString().slice(0,10));
+  }
+  return arr;
+}
+
+function populateDatesStaff(){
+  const sel = document.getElementById('stfData');
+  const dates = getUpcomingDates();
+  sel.innerHTML = dates.map(d=>`<option value="${d}">${formatDateBR(d)}</option>`).join('');
+}
+
+function generateSlots(){
+  const slots = [];
+  for(let h=8; h<12; h++){ slots.push(String(h).padStart(2,'0')+':00'); slots.push(String(h).padStart(2,'0')+':30'); }
+  for(let h=13; h<17; h++){ slots.push(String(h).padStart(2,'0')+':00'); slots.push(String(h).padStart(2,'0')+':30'); }
+  return slots;
+}
+
+function renderSlotsStaff(){
+  const data = document.getElementById('stfData').value;
+  const wrap = document.getElementById('stfSlotsWrap');
+  state.selectedSlot = null;
+  const taken = state.appointments.filter(a=>a.origem==='agendamento' && a.data===data).map(a=>a.hora);
+  wrap.innerHTML = generateSlots().map(h=>{
+    const isTaken = taken.includes(h);
+    return `<div class="slot ${isTaken?'taken':''}" ${isTaken?'':`onclick="selectSlotStaff('${h}', this)"`}>${h}</div>`;
+  }).join('');
+}
+
+function selectSlotStaff(hora, el){
+  document.querySelectorAll('#stfSlotsWrap .slot').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedSlot = hora;
+}
+
+function buscarPacienteStaff(){
+  const tel = document.getElementById('stfTelefone').value.trim();
+  const box = document.getElementById('stfPacienteEncontrado');
+  if(!tel){ box.innerHTML = `<div class="msg show warn">Informe o telefone do paciente.</div>`; state.staffAgendaPacienteId=null; return; }
+  const numeros = tel.replace(/\D/g,'');
+  const p = state.patients.find(x=>x.tel.replace(/\D/g,'')===numeros);
+  if(!p){
+    box.innerHTML = `<div class="msg show warn">Nenhum cadastro encontrado com esse telefone. Cadastre um novo paciente abaixo.</div>`;
+    state.staffAgendaPacienteId = null;
+    return;
+  }
+  state.staffAgendaPacienteId = p.id;
+  box.innerHTML = `<div class="msg show ok">Paciente localizado: <strong>${p.nome}</strong>${p.cartao ? ' — CNS '+p.cartao : ''}.</div>`;
+}
+
+function toggleCadastroRapido(){
+  const box = document.getElementById('cadastroRapidoBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function cadastrarPacienteRapido(){
+  const nome = document.getElementById('crNome').value.trim();
+  const nasc = document.getElementById('crNasc').value;
+  const tel = document.getElementById('crTel').value.trim();
+  const cartao = document.getElementById('crCartao').value.trim();
+  const ubs = document.getElementById('crUbs').value;
+
+  if(!nome || !tel){
+    showMsg('msgAgendaStaff', 'Preencha ao menos nome e telefone do novo paciente.', 'warn');
+    return;
+  }
+  const p = addPatient({nome, nasc, tel, cartao, ubs});
+  state.staffAgendaPacienteId = p.id;
+  document.getElementById('stfPacienteEncontrado').innerHTML = `<div class="msg show ok">Paciente <strong>${p.nome}</strong> cadastrado e selecionado.</div>`;
+  ['crNome','crNasc','crTel','crCartao'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('cadastroRapidoBox').style.display = 'none';
+  salvarEstado();
+}
+
+function addAppointment(patientId, tipo, data, hora){
+  const appt = {
+    id: state.nextApptId++,
+    patientId, tipo, data, hora,
+    origem: 'agendamento',
+    status: 'agendado',
+    symptomsReport: null,
+    triage: null,
+    checkInOrder: null,
+    attendedAt: null,
+    motivo: null
+  };
+  state.appointments.push(appt);
+  return appt;
+}
+
+function confirmarAgendamentoStaff(){
+  const patientId = state.staffAgendaPacienteId;
+  const tipo = document.getElementById('stfTipo').value;
+  const data = document.getElementById('stfData').value;
+
+  if(!patientId){ showMsg('msgAgendaStaff','Localize ou cadastre o paciente antes de agendar.','warn'); return; }
+  if(!state.selectedSlot){ showMsg('msgAgendaStaff','Selecione um horário disponível.','warn'); return; }
+
+  addAppointment(patientId, tipo, data, state.selectedSlot);
+  showMsg('msgAgendaStaff', `Consulta agendada para ${formatDateBR(data)} às ${state.selectedSlot}.`, 'ok');
+  renderSlotsStaff();
+  renderAgendaTabela();
+  salvarEstado();
+}
+
+function statusKey(appt){
+  if(['atendido','nao_compareceu','nao_atendido'].includes(appt.status)) return appt.status;
+  if(appt.status==='aguardando') return 'aguardando';
+  return 'agendado';
+}
+
+function renderFiltrosAgenda(){
+  const datasUnicas = Array.from(new Set(state.appointments.filter(a=>a.origem==='agendamento').map(a=>a.data))).sort();
+  const wrapData = document.getElementById('filtrosAgendaData');
+  const opcoesData = [['todas','Todas']].concat(datasUnicas.map(d=>[d, formatDateBR(d)]));
+  wrapData.innerHTML = opcoesData.map(([key,label])=>
+    `<button class="${state.agendaFilterDate===key?'active':''}" onclick="setAgendaFilterDate('${key}')">${label}</button>`
+  ).join('');
+
+  const statusOpts = [['todos','Todas'],['agendado','Agendado'],['atendido','Atendido'],['nao_compareceu','Não compareceu'],['nao_atendido','Não atendido']];
+  document.getElementById('filtrosAgendaStatus').innerHTML = statusOpts.map(([key,label])=>
+    `<button class="${state.agendaFilterStatus===key?'active':''}" onclick="setAgendaFilterStatus('${key}')">${label}</button>`
+  ).join('');
+}
+
+function setAgendaFilterDate(key){ state.agendaFilterDate = key; renderAgendaTabela(); }
+function setAgendaFilterStatus(key){ state.agendaFilterStatus = key; renderAgendaTabela(); }
+
+function renderAgendaTabela(){
+  renderFiltrosAgenda();
+  const wrap = document.getElementById('agendaTabela');
+
+  let lista = state.appointments.filter(a=>a.origem==='agendamento');
+  if(state.agendaFilterDate !== 'todas'){ lista = lista.filter(a=>a.data === state.agendaFilterDate); }
+  if(state.agendaFilterStatus !== 'todos'){ lista = lista.filter(a=>statusKey(a) === state.agendaFilterStatus); }
+  lista = lista.slice().sort((a,b)=> (a.data+a.hora).localeCompare(b.data+b.hora));
+
+  if(!lista.length){
+    wrap.innerHTML = `<div class="empty">Nenhum agendamento encontrado para este filtro.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `
+    <table>
+      <tr><th>Data</th><th>Hora</th><th>Paciente</th><th>Telefone</th><th>Tipo de atendimento</th><th>Situação</th><th></th></tr>
+      ${lista.map(a=>{
+        const p = state.patients.find(x=>x.id===a.patientId);
+        const finalizado = ['atendido','nao_compareceu','nao_atendido'].includes(a.status);
+        return `<tr>
+          <td>${formatDateBR(a.data)}</td>
+          <td>${a.hora}</td>
+          <td>${p ? p.nome : '—'}</td>
+          <td>${p ? p.tel : '—'}</td>
+          <td>${a.tipo}</td>
+          <td>${computeStatusLabel(a)}</td>
+          <td style="white-space:nowrap;">
+            ${finalizado ? '' : `
+              <button class="btn secondary small" onclick="finalizarAtendimento(${a.id},'atendido')">Atendido</button>
+              <button class="btn ghost small" onclick="finalizarAtendimento(${a.id},'nao_compareceu')">Não compareceu</button>
+              <button class="btn danger small" onclick="finalizarAtendimento(${a.id},'nao_atendido')">Não atendido</button>
+            `}
+          </td>
+        </tr>`;
+      }).join('')}
+    </table>`;
+}
+
+/* ======================= TRIAGEM (clínico) ======================= */
+function refreshTriagemSelect(){
+  const sel = document.getElementById('tAgendamento');
+  const pending = state.appointments.filter(a=>a.origem==='pronto_atendimento' && a.status==='aguardando_triagem');
+  sel.innerHTML = pending.length
+    ? pending.map(a=>{
+        const p = state.patients.find(x=>x.id===a.patientId);
+        return `<option value="${a.id}">${p ? p.nome : 'Paciente'} — chegada ${a.hora}</option>`;
+      }).join('')
+    : `<option value="">Nenhum paciente aguardando triagem</option>`;
+  renderResumoSintomas();
+}
+
+function renderResumoSintomas(){
+  const wrap = document.getElementById('resumoSintomas');
+  const apptId = parseInt(document.getElementById('tAgendamento').value);
+  const appt = state.appointments.find(a=>a.id===apptId);
+  if(!appt || !appt.symptomsReport){
+    wrap.innerHTML = '';
+    return;
+  }
+  const s = appt.symptomsReport;
+  wrap.innerHTML = `
+    <div class="info-box">
+      <div><span class="k">Sintomas relatados:</span> ${s.selecionados.length ? s.selecionados.join(', ') : 'não informado'}</div>
+      <div><span class="k">Dor relatada:</span> ${s.dor}/10 &nbsp;·&nbsp; <span class="k">Duração:</span> ${s.duracao}</div>
+      ${s.detalhes ? `<div><span class="k">Detalhes:</span> ${s.detalhes}</div>` : ''}
+    </div>`;
+}
+
+function calcularUrgencia(t){
+  if(t.alertaPeito || t.alertaFalta || t.alertaSangramento || t.alertaConsciencia){
+    return 'vermelho';
+  }
+  const dor = t.dor || 0;
+  const temp = t.temp || 36.5;
+  const sist = t.sist || 120;
+
+  let score = 0;
+  if(dor >= 8) score += 3; else if(dor >= 5) score += 2; else if(dor >= 2) score += 1;
+  if(temp >= 39.5) score += 3; else if(temp >= 38.5) score += 2; else if(temp >= 37.8) score += 1;
+  if(sist >= 180 || sist <= 85) score += 3; else if(sist >= 160) score += 1;
+
+  if(score >= 6) return 'laranja';
+  if(score >= 4) return 'amarelo';
+  if(score >= 2) return 'verde';
+  return 'azul';
+}
+
+function aplicarTriagem(apptId, vitals){
+  const appt = state.appointments.find(a=>a.id===apptId);
+  if(!appt) return null;
+  const dor = appt.symptomsReport ? appt.symptomsReport.dor : 0;
+  const urgencia = calcularUrgencia(Object.assign({dor}, vitals));
+  appt.triage = Object.assign({}, vitals, {urgencia, checkInTime: new Date().toISOString()});
+  appt.status = 'aguardando';
+  return appt;
+}
+
+function submeterTriagem(){
+  const apptId = parseInt(document.getElementById('tAgendamento').value);
+  if(!apptId){ showMsg('msgTriagem','Selecione um paciente válido.','warn'); return; }
+
+  const vitals = {
+    alertaPeito: document.getElementById('alertaPeito').checked,
+    alertaFalta: document.getElementById('alertaFalta').checked,
+    alertaSangramento: document.getElementById('alertaSangramento').checked,
+    alertaConsciencia: document.getElementById('alertaConsciencia').checked,
+    temp: parseFloat(document.getElementById('tTemp').value) || null,
+    sist: parseInt(document.getElementById('tPasSist').value) || null,
+    diast: parseInt(document.getElementById('tPasDiast').value) || null
+  };
+
+  const appt = aplicarTriagem(apptId, vitals);
+  const u = URGENCY[appt.triage.urgencia];
+
+  document.getElementById('resultadoTriagem').innerHTML = `
+    <div class="urgency-result" style="border-color:${u.color}; background:${u.soft};">
+      <span class="urgency-badge" style="background:${u.color};">${u.label}</span>
+      <div style="font-size:13.5px;color:var(--ink);">Tempo de espera de referência: <strong>${u.sla}</strong>.</div>
+    </div>`;
+
+  showMsg('msgTriagem', 'Triagem registrada com sucesso.', 'ok');
+  ['alertaPeito','alertaFalta','alertaSangramento','alertaConsciencia'].forEach(id=>document.getElementById(id).checked=false);
+  ['tTemp','tPasSist','tPasDiast'].forEach(id=>document.getElementById(id).value='');
+  refreshTriagemSelect();
+  salvarEstado();
+}
+
+/* ======================= FILA DE ATENDIMENTO (clínico) ======================= */
+function renderFiltros(){
+  const wrap = document.getElementById('filtrosUrgencia');
+  const opts = [['todos','Todos']].concat(Object.entries(URGENCY).map(([k,v])=>[k, v.label.split(' — ')[0]]));
+  wrap.innerHTML = opts.map(([key,label])=>
+    `<button class="${state.activeFilter===key?'active':''}" onclick="setFilter('${key}')">${label}</button>`
+  ).join('');
+}
+
+function setFilter(key){ state.activeFilter = key; renderFilaStaff(); }
+
+function renderFilaStaff(){
+  renderFiltros();
+  const wrap = document.getElementById('filaAtendimento');
+  let queue = state.appointments.filter(a=>a.origem==='pronto_atendimento' && a.status==='aguardando' && a.triage);
+
+  if(state.activeFilter !== 'todos'){
+    queue = queue.filter(a=>a.triage.urgencia === state.activeFilter);
+  }
+  queue.sort((a,b)=>{
+    const ua = URGENCY[a.triage.urgencia].order, ub = URGENCY[b.triage.urgencia].order;
+    if(ua !== ub) return ua - ub;
+    return a.checkInOrder - b.checkInOrder;
+  });
+
+  if(!queue.length){
+    wrap.innerHTML = `<div class="empty">Nenhum paciente aguardando nesta categoria.</div>`;
+  } else {
+    wrap.innerHTML = queue.map(a=>{
+      const p = state.patients.find(x=>x.id===a.patientId);
+      const u = URGENCY[a.triage.urgencia];
+      const sintomas = a.symptomsReport && a.symptomsReport.selecionados.length ? a.symptomsReport.selecionados.join(', ') : 'sem sintomas específicos informados';
+      const dor = a.symptomsReport ? a.symptomsReport.dor : '—';
+      return `
+      <div class="queue-row" style="border-left-color:${u.color};">
+        <div class="time">${a.hora}</div>
+        <div class="who">
+          <div class="name">${p ? p.nome : 'Paciente'}</div>
+          <div class="meta">Dor ${dor}/10 · ${sintomas}</div>
+        </div>
+        <span class="badge" style="background:${u.color};">${u.label.split(' — ')[0]}</span>
+        <div class="actions">
+          <button class="btn secondary small" onclick="finalizarAtendimento(${a.id},'atendido')">Atendido</button>
+          <button class="btn ghost small" onclick="finalizarAtendimento(${a.id},'nao_compareceu')">Não compareceu</button>
+          <button class="btn danger small" onclick="finalizarAtendimento(${a.id},'nao_atendido')">Não atendido</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  const wrap2 = document.getElementById('listaFinalizados');
+  const finalizados = state.appointments.filter(a=>a.origem==='pronto_atendimento' && ['atendido','nao_compareceu','nao_atendido'].includes(a.status));
+  wrap2.innerHTML = finalizados.length
+    ? finalizados.map(a=>{
+        const p = state.patients.find(x=>x.id===a.patientId);
+        const u = a.triage ? URGENCY[a.triage.urgencia] : null;
+        return `<div class="queue-row" style="border-left-color:${u?u.color:'#ccc'};opacity:0.8;">
+          <div class="time">${a.hora}</div>
+          <div class="who"><div class="name">${p?p.nome:'Paciente'}</div><div class="meta">${computeStatusLabel(a)}</div></div>
+          ${u?`<span class="badge" style="background:${u.color};">${u.label.split(' — ')[0]}</span>`:''}
+        </div>`;
+      }).join('')
+    : `<div class="empty">Nenhum atendimento finalizado ainda.</div>`;
+}
+
+function finalizarAtendimento(id, novoStatus){
+  const appt = state.appointments.find(a=>a.id===id);
+  if(!appt) return;
+
+  let motivo = appt.motivo || null;
+  if(novoStatus === 'nao_atendido'){
+    const digitado = window.prompt('Descreva o motivo do não atendimento:', '');
+    if(digitado === null) return;
+    motivo = digitado.trim() || 'Não informado';
+  } else if(novoStatus === 'nao_compareceu'){
+    const ok = window.confirm('Confirmar que o paciente não compareceu?');
+    if(!ok) return;
+    motivo = null;
+  } else {
+    motivo = null;
+  }
+
+  appt.status = novoStatus;
+  appt.motivo = motivo;
+  appt.attendedAt = new Date().toISOString();
+
+  renderAgendaTabela();
+  renderFilaStaff();
+  renderIndicadoresStaff();
+  renderSintomasHistoricoStaff();
+  salvarEstado();
+}
+
+/* ======================= SINTOMAS — HISTÓRICO POR CHEGADA (clínico) ======================= */
+function renderSintomasHistoricoStaff(){
+  const wrap = document.getElementById('sintomasHistorico');
+  const lista = state.appointments
+    .filter(a=>a.origem==='pronto_atendimento')
+    .slice()
+    .sort((a,b)=> a.checkInOrder - b.checkInOrder);
+
+  if(!lista.length){
+    wrap.innerHTML = `<div class="empty">Nenhum sintoma relatado ainda hoje.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = lista.map(a=>{
+    const p = state.patients.find(x=>x.id===a.patientId);
+    const s = a.symptomsReport;
+    const u = a.triage ? URGENCY[a.triage.urgencia] : null;
+    return `
+    <div class="history-card" style="border-left-color:${u ? u.color : 'var(--border)'};">
+      <div class="top-row">
+        <div class="date">${a.hora} — ${p ? p.nome : 'Paciente'} ${p ? '· '+p.tel : ''}</div>
+        ${u ? `<span class="badge" style="background:${u.color};color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:3px;">${u.label.split(' — ')[0]}</span>` : `<span style="font-size:12.5px;color:var(--ink-muted);">${computeStatusLabel(a)}</span>`}
+      </div>
+      <div class="detail"><b>Sintomas:</b> ${s.selecionados.length ? s.selecionados.join(', ') : 'não informado'} — dor ${s.dor}/10, ${s.duracao}${s.detalhes ? ' — '+s.detalhes : ''}</div>
+      <div class="detail"><b>Situação atual:</b> ${computeStatusLabel(a)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ======================= HISTÓRICO POR PACIENTE (busca — clínico) ======================= */
+function buscarHistorico(){
+  const termo = document.getElementById('hstBusca').value.trim().toLowerCase();
+  const resultadosWrap = document.getElementById('historicoResultados');
+  document.getElementById('historicoResumo').innerHTML = '';
+  document.getElementById('historicoLista').innerHTML = '';
+
+  if(!termo){
+    resultadosWrap.innerHTML = `<div class="empty">Digite um nome ou telefone para buscar.</div>`;
+    return;
+  }
+
+  const numerosBusca = termo.replace(/\D/g,'');
+  const encontrados = state.patients.filter(p=>
+    p.nome.toLowerCase().includes(termo) ||
+    (numerosBusca && p.tel.replace(/\D/g,'').includes(numerosBusca))
+  );
+
+  if(!encontrados.length){
+    resultadosWrap.innerHTML = `<div class="empty">Nenhum paciente encontrado com esse nome ou telefone.</div>`;
+    return;
+  }
+
+  if(encontrados.length === 1){
+    resultadosWrap.innerHTML = '';
+    renderHistoricoPacienteEspecifico(encontrados[0].id);
+    return;
+  }
+
+  resultadosWrap.innerHTML = `
+    <div class="sub" style="margin-bottom:8px;">${encontrados.length} pacientes encontrados — selecione um:</div>
+    ${encontrados.map(p=>`<button class="btn ghost small" style="margin:0 6px 6px 0;" onclick="renderHistoricoPacienteEspecifico(${p.id})">${p.nome} — ${p.tel}</button>`).join('')}
+  `;
+}
+
+function renderHistoricoPacienteEspecifico(patientId){
+  const resumo = document.getElementById('historicoResumo');
+  const lista = document.getElementById('historicoLista');
+  const p = state.patients.find(x=>x.id===patientId);
+  if(!p) return;
+
+  const historico = state.appointments
+    .filter(a=>a.patientId===patientId)
+    .slice()
+    .sort((a,b)=> (b.data+b.hora).localeCompare(a.data+a.hora));
+
+  resumo.innerHTML = `
+    <div class="info-box">
+      <div><span class="k">${p.nome}</span> ${p.cartao ? '· CNS '+p.cartao : ''}</div>
+      <div>${p.tel} &nbsp;·&nbsp; ${p.ubs || 'UBS não informada'}</div>
+      <div><span class="k">Total de registros:</span> ${historico.length} &nbsp;·&nbsp; <span class="k">Atendidos:</span> ${historico.filter(a=>a.status==='atendido').length}</div>
+    </div>`;
+
+  if(!historico.length){
+    lista.innerHTML = `<div class="empty">Este paciente ainda não tem registros.</div>`;
+    return;
+  }
+
+  lista.innerHTML = historico.map(a=>{
+    const u = a.triage ? URGENCY[a.triage.urgencia] : null;
+    const s = a.symptomsReport;
+    return `
+    <div class="history-card" style="border-left-color:${u ? u.color : 'var(--border)'};">
+      <div class="top-row">
+        <div class="date">${formatDateBR(a.data)} às ${a.hora} — ${a.tipo}</div>
+        ${u ? `<span class="badge" style="background:${u.color};color:#fff;font-size:12px;font-weight:700;padding:3px 9px;border-radius:3px;">${u.label.split(' — ')[0]}</span>` : `<span style="font-size:12.5px;color:var(--ink-muted);">${computeStatusLabel(a)}</span>`}
+      </div>
+      <div class="detail"><b>Situação:</b> ${computeStatusLabel(a)}</div>
+      ${s ? `<div class="detail"><b>Sintomas relatados:</b> ${s.selecionados.length ? s.selecionados.join(', ') : 'não informado'} — dor ${s.dor}/10, ${s.duracao}${s.detalhes ? ' — '+s.detalhes : ''}</div>` : ''}
+      ${a.triage ? `<div class="detail"><b>Triagem:</b> temperatura ${a.triage.temp ?? '—'}°C, pressão ${a.triage.sist ?? '—'}/${a.triage.diast ?? '—'}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ======================= INDICADORES (clínico) ======================= */
+function renderIndicadoresStaff(){
+  const prontoAtendimento = state.appointments.filter(a=>a.origem==='pronto_atendimento');
+  const total = state.appointments.length;
+  const aguardando = prontoAtendimento.filter(a=>a.status==='aguardando').length;
+  const atendidos = state.appointments.filter(a=>a.status==='atendido').length;
+
+  const waitTimes = prontoAtendimento
+    .filter(a=>a.status==='atendido' && a.triage && a.triage.checkInTime && a.attendedAt)
+    .map(a => Math.max(1, Math.round((new Date(a.attendedAt) - new Date(a.triage.checkInTime))/60000)));
+  const tempoMedio = waitTimes.length ? Math.round(waitTimes.reduce((s,v)=>s+v,0)/waitTimes.length) : 0;
+
+  document.getElementById('metricsWrap').innerHTML = `
+    <div class="metric"><div class="num">${total}</div><div class="lbl">Registros totais</div></div>
+    <div class="metric"><div class="num">${aguardando}</div><div class="lbl">Aguardando na fila</div></div>
+    <div class="metric"><div class="num">${atendidos}</div><div class="lbl">Atendidos</div></div>
+    <div class="metric"><div class="num">${tempoMedio} min</div><div class="lbl">Tempo médio até atendimento</div></div>
+  `;
+
+  const withTriage = prontoAtendimento.filter(a=>a.triage);
+  const counts = {};
+  Object.keys(URGENCY).forEach(k=>counts[k]=0);
+  withTriage.forEach(a=>counts[a.triage.urgencia]++);
+  const max = Math.max(1, ...Object.values(counts));
+
+  document.getElementById('urgencyBars').innerHTML = Object.entries(URGENCY).map(([k,u])=>{
+    const val = counts[k];
+    const pct = Math.round((val/max)*100);
+    return `<div class="bar-row">
+      <div class="lbl">${u.label.split(' — ')[0]}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${u.color};"></div></div>
+      <div class="val">${val}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ======================= INICIALIZAÇÃO ======================= */
+(async function iniciar(){
+  const carregou = await carregarEstado();
+  if(!carregou){
+    seedData();
+    await salvarEstado();
+  }
+})();
+</script>
+</body>
+</html>
